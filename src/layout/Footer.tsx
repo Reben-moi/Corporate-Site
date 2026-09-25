@@ -42,8 +42,8 @@ export default function Footer() {
               <li>
                 {siteInfo.address.line1}, {siteInfo.address.city}, {siteInfo.address.country}
               </li>
-              <li>{siteInfo.email}</li>
-              <li>{siteInfo.phone}</li>
+              <li>{siteInfo.contact.email}</li>
+              <li>{siteInfo.contact.phone}</li>
             </ul>
           </div>
         </div>
