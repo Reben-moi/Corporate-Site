@@ -1,0 +1,60 @@
+// ---------------------------------------------------------------
+// Bootstrap 5 — Sass entry point.
+// Bootstrap's own variables are overridden BEFORE its source is
+// imported, so the compiled output carries Muadifam's design
+// tokens instead of Bootstrap defaults. Only the parts of
+// Bootstrap actually used (grid, containers, buttons, forms,
+// utilities) are imported to keep the CSS bundle lean.
+// ---------------------------------------------------------------
+
+@use "sass:color";
+@use "tokens" as *;
+
+// --- Variable overrides (must precede the Bootstrap import) -----
+$primary: $accent;
+$dark: $ink;
+$light: $paper;
+$body-color: $grey-600;
+$body-bg: $paper;
+$font-family-base: $font-body;
+$font-family-sans-serif: $font-body;
+$headings-font-family: $font-heading;
+$headings-font-weight: 600;
+$headings-color: $ink;
+$border-color: $grey-200;
+$link-color: $accent;
+$link-hover-color: $accent-deep;
+$container-max-widths: (
+  sm: 540px,
+  md: 720px,
+  lg: 960px,
+  xl: 1140px,
+  xxl: $container-max
+);
+$grid-gutter-width: 2rem;
+$btn-border-radius: 0;
+$btn-font-weight: 600;
+$enable-rounded: false;
+$enable-shadows: false;
+$enable-negative-margins: true;
+$input-border-radius: 0;
+
+// --- Bootstrap source (functions/variables first, then modules) -
+@import "../../node_modules/bootstrap/scss/functions";
+@import "../../node_modules/bootstrap/scss/variables";
+@import "../../node_modules/bootstrap/scss/variables-dark";
+@import "../../node_modules/bootstrap/scss/maps";
+@import "../../node_modules/bootstrap/scss/mixins";
+@import "../../node_modules/bootstrap/scss/utilities";
+
+@import "../../node_modules/bootstrap/scss/root";
+@import "../../node_modules/bootstrap/scss/reboot";
+@import "../../node_modules/bootstrap/scss/type";
+@import "../../node_modules/bootstrap/scss/containers";
+@import "../../node_modules/bootstrap/scss/grid";
+@import "../../node_modules/bootstrap/scss/forms";
+@import "../../node_modules/bootstrap/scss/buttons";
+@import "../../node_modules/bootstrap/scss/transitions";
+@import "../../node_modules/bootstrap/scss/helpers";
+
+@import "../../node_modules/bootstrap/scss/utilities/api";

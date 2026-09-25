@@ -1,0 +1,692 @@
+@use "tokens" as *;
+@use "bootstrap" as *;
+
+// ---------------------------------------------------------------
+// CSS custom properties (used directly in component-level CSS
+// and available for any inline/dynamic styling)
+// ---------------------------------------------------------------
+:root {
+  --ink: #{$ink};
+  --ink-soft: #{$ink-soft};
+  --paper: #{$paper};
+  --white: #{$white};
+  --grey-600: #{$grey-600};
+  --grey-300: #{$grey-300};
+  --grey-200: #{$grey-200};
+  --accent: #{$accent};
+  --accent-deep: #{$accent-deep};
+  --font-heading: #{$font-heading};
+  --font-body: #{$font-body};
+  --container-max: #{$container-max};
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-body);
+  color: var(--grey-600);
+  background: var(--paper);
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-heading);
+  color: var(--ink);
+  letter-spacing: -0.01em;
+}
+
+a {
+  text-decoration: none;
+}
+
+img {
+  max-width: 100%;
+  display: block;
+}
+
+.container-wide {
+  width: 100%;
+  max-width: var(--container-max);
+  margin-inline: auto;
+  padding-inline: 1.5rem;
+
+  @media (min-width: 992px) {
+    padding-inline: 3rem;
+  }
+}
+
+.section {
+  padding-block: $space-6;
+
+  @media (max-width: 767px) {
+    padding-block: $space-5;
+  }
+}
+
+.section--dark {
+  background: var(--ink);
+  color: rgba(255, 255, 255, 0.75);
+
+  h1, h2, h3, h4 { color: var(--white); }
+}
+
+.section--soft {
+  background: var(--white);
+}
+
+.hairline {
+  height: 1px;
+  background: var(--grey-200);
+  border: none;
+}
+
+// ---------------------------------------------------------------
+// Section label — small letterspaced caps with a short accent rule
+// ---------------------------------------------------------------
+.section-label {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: $space-2;
+
+  &::before {
+    content: "";
+    display: inline-block;
+    width: 28px;
+    height: 2px;
+    background: var(--accent);
+  }
+}
+
+.section-heading {
+  max-width: 640px;
+  margin-bottom: $space-4;
+
+  h2 {
+    font-size: clamp(1.75rem, 3vw, 2.5rem);
+    line-height: 1.15;
+    margin-bottom: $space-2;
+  }
+
+  p {
+    font-size: 1.0625rem;
+    color: var(--grey-600);
+  }
+}
+
+.section--dark .section-heading p {
+  color: rgba(255, 255, 255, 0.65);
+}
+
+// ---------------------------------------------------------------
+// Buttons — square corners, letterspaced, no shadow
+// ---------------------------------------------------------------
+.btn-muadifam {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.85rem 1.75rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  border: 1px solid transparent;
+  transition: background-color 0.25s ease, color 0.25s ease, border-color 0.25s ease;
+  white-space: nowrap;
+}
+
+.btn-muadifam--primary {
+  background: var(--accent);
+  color: var(--ink);
+
+  &:hover {
+    background: var(--accent-deep);
+    color: var(--white);
+  }
+}
+
+.btn-muadifam--outline {
+  border-color: currentColor;
+  color: inherit;
+  background: transparent;
+
+  &:hover {
+    background: var(--white);
+    color: var(--ink);
+  }
+}
+
+.btn-muadifam--outline-dark {
+  border-color: var(--ink);
+  color: var(--ink);
+  background: transparent;
+
+  &:hover {
+    background: var(--ink);
+    color: var(--white);
+  }
+}
+
+// ---------------------------------------------------------------
+// Image placeholder — clearly labelled, never pretending to be
+// a real photograph
+// ---------------------------------------------------------------
+.image-placeholder {
+  position: relative;
+  width: 100%;
+  aspect-ratio: var(--ph-ratio, 4 / 3);
+  background:
+    linear-gradient(135deg, rgba(176, 131, 65, 0.12), rgba(16, 24, 32, 0.06)),
+    repeating-linear-gradient(45deg, rgba(16, 24, 32, 0.03) 0 2px, transparent 2px 14px);
+  border: 1px solid var(--grey-200);
+  display: flex;
+  align-items: flex-end;
+  overflow: hidden;
+
+  span {
+    display: block;
+    width: 100%;
+    padding: 0.6rem 0.85rem;
+    background: rgba(16, 24, 32, 0.78);
+    color: rgba(255, 255, 255, 0.85);
+    font-size: 0.6875rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    font-weight: 500;
+  }
+}
+
+// ---------------------------------------------------------------
+// FadeIn utility (paired with useInView hook)
+// ---------------------------------------------------------------
+.fade-in {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+
+  &.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// ---------------------------------------------------------------
+// Navbar
+// ---------------------------------------------------------------
+.site-navbar {
+  position: fixed;
+  inset-inline: 0;
+  top: 0;
+  z-index: 1000;
+  padding-block: 1.25rem;
+  transition: background-color 0.3s ease, padding 0.3s ease, box-shadow 0.3s ease;
+
+  &__inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  &.is-scrolled,
+  &.is-open {
+    background: var(--ink);
+    padding-block: 0.85rem;
+    box-shadow: 0 1px 0 rgba(255, 255, 255, 0.06);
+  }
+}
+
+.site-navbar__brand {
+  display: flex;
+  flex-direction: column;
+  line-height: 1;
+  color: var(--white);
+
+  strong {
+    font-family: var(--font-heading);
+    font-size: 1.05rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+  }
+
+  small {
+    margin-top: 0.2rem;
+    font-size: 0.6rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+}
+
+.site-navbar__links {
+  display: none;
+  align-items: center;
+  gap: 2.25rem;
+
+  @media (min-width: 992px) {
+    display: flex;
+  }
+
+  a {
+    font-size: 0.8125rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.75);
+    transition: color 0.2s ease;
+
+    &:hover,
+    &.is-active {
+      color: var(--white);
+    }
+  }
+}
+
+.site-navbar__cta {
+  display: none;
+
+  @media (min-width: 992px) {
+    display: inline-flex;
+  }
+}
+
+.site-navbar__toggle {
+  display: inline-flex;
+  background: none;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  color: var(--white);
+  padding: 0.5rem 0.75rem;
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+
+  @media (min-width: 992px) {
+    display: none;
+  }
+}
+
+.site-navbar__mobile {
+  background: var(--ink);
+  padding: 1.5rem 0 2rem;
+
+  @media (min-width: 992px) {
+    display: none;
+  }
+
+  a {
+    display: block;
+    padding: 0.85rem 0;
+    color: rgba(255, 255, 255, 0.85);
+    font-size: 1rem;
+    font-weight: 600;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  }
+}
+
+// ---------------------------------------------------------------
+// Hero
+// ---------------------------------------------------------------
+.hero {
+  position: relative;
+  min-height: 92vh;
+  display: flex;
+  align-items: flex-end;
+  color: var(--white);
+  background: var(--ink);
+  overflow: hidden;
+
+  &__media {
+    position: absolute;
+    inset: 0;
+  }
+
+  &__media .image-placeholder {
+    aspect-ratio: auto;
+    height: 100%;
+    border: none;
+  }
+
+  &__overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(16, 24, 32, 0.55) 0%, rgba(16, 24, 32, 0.85) 100%);
+  }
+
+  &__content {
+    position: relative;
+    z-index: 1;
+    padding-block: $space-6 $space-5;
+  }
+
+  &__eyebrow {
+    font-size: 0.8125rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: $space-2;
+  }
+
+  h1 {
+    color: var(--white);
+    font-size: clamp(2.25rem, 5vw, 4rem);
+    line-height: 1.05;
+    max-width: 760px;
+    margin-bottom: $space-2;
+  }
+
+  &__lede {
+    max-width: 560px;
+    font-size: 1.1rem;
+    color: rgba(255, 255, 255, 0.8);
+    margin-bottom: $space-4;
+  }
+
+  &__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+}
+
+.page-header {
+  background: var(--ink);
+  color: var(--white);
+  padding-block: 9rem $space-5;
+
+  h1 {
+    color: var(--white);
+    font-size: clamp(2rem, 4vw, 3rem);
+    max-width: 720px;
+  }
+
+  p {
+    max-width: 600px;
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 1.05rem;
+    margin-top: $space-2;
+  }
+}
+
+// ---------------------------------------------------------------
+// Service row (editorial, numbered, alternating image side)
+// ---------------------------------------------------------------
+.service-row {
+  display: grid;
+  gap: $space-4;
+  padding-block: $space-4;
+  align-items: center;
+
+  @media (min-width: 768px) {
+    grid-template-columns: 1fr 1fr;
+    gap: $space-5;
+  }
+
+  &:not(:last-child) {
+    border-bottom: 1px solid var(--grey-200);
+  }
+
+  &--reverse .service-row__media {
+    @media (min-width: 768px) {
+      order: 2;
+    }
+  }
+
+  &__index {
+    font-family: var(--font-heading);
+    font-size: 0.875rem;
+    color: var(--accent);
+    letter-spacing: 0.1em;
+    margin-bottom: 0.75rem;
+    display: block;
+  }
+
+  h3 {
+    font-size: 1.5rem;
+    margin-bottom: 0.75rem;
+  }
+
+  p {
+    margin-bottom: $space-2;
+  }
+}
+
+// ---------------------------------------------------------------
+// Project item (large, image-led)
+// ---------------------------------------------------------------
+.project-item {
+  display: grid;
+  gap: $space-3;
+  padding-block: $space-4;
+
+  @media (min-width: 768px) {
+    grid-template-columns: 1.3fr 1fr;
+    gap: $space-5;
+    align-items: end;
+  }
+
+  &:not(:last-child) {
+    border-bottom: 1px solid var(--grey-200);
+  }
+
+  &__meta {
+    display: flex;
+    gap: 1.25rem;
+    font-size: 0.75rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 0.75rem;
+  }
+
+  h3 {
+    font-size: 1.6rem;
+    margin-bottom: 0.75rem;
+  }
+}
+
+// ---------------------------------------------------------------
+// Industry item (bordered grid, no shadows)
+// ---------------------------------------------------------------
+.industry-grid {
+  display: grid;
+  gap: 0;
+  grid-template-columns: repeat(1, 1fr);
+  border-top: 1px solid var(--grey-200);
+  border-left: 1px solid var(--grey-200);
+
+  @media (min-width: 576px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @media (min-width: 992px) {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.industry-item {
+  padding: $space-4 $space-3;
+  border-right: 1px solid var(--grey-200);
+  border-bottom: 1px solid var(--grey-200);
+
+  h3 {
+    font-size: 1.15rem;
+    margin-bottom: 0.6rem;
+  }
+
+  p {
+    font-size: 0.9375rem;
+  }
+}
+
+// ---------------------------------------------------------------
+// Values / Why Muadifam
+// ---------------------------------------------------------------
+.value-item {
+  padding-block: $space-3;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+
+  h3 {
+    font-size: 1.1rem;
+    margin-bottom: 0.5rem;
+  }
+
+  p {
+    font-size: 0.9375rem;
+    color: rgba(255, 255, 255, 0.65);
+  }
+}
+
+// ---------------------------------------------------------------
+// CTA section
+// ---------------------------------------------------------------
+.cta-section {
+  background: var(--ink);
+  color: var(--white);
+  padding-block: $space-6;
+  text-align: center;
+
+  h2 {
+    color: var(--white);
+    font-size: clamp(1.75rem, 3.5vw, 2.75rem);
+    max-width: 720px;
+    margin-inline: auto;
+    margin-bottom: $space-3;
+  }
+}
+
+// ---------------------------------------------------------------
+// Contact form
+// ---------------------------------------------------------------
+.contact-form {
+  .form-label {
+    font-size: 0.8125rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--ink);
+  }
+
+  .form-control {
+    border-color: var(--grey-200);
+    padding: 0.75rem 0.9rem;
+
+    &:focus {
+      border-color: var(--accent);
+      box-shadow: none;
+    }
+  }
+}
+
+.contact-info-item {
+  padding-block: $space-2;
+  border-top: 1px solid var(--grey-200);
+
+  &:last-child {
+    border-bottom: 1px solid var(--grey-200);
+  }
+
+  h4 {
+    font-size: 0.8125rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 0.4rem;
+  }
+}
+
+.map-placeholder {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  background: var(--ink);
+  color: rgba(255, 255, 255, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8125rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  border: 1px solid var(--grey-200);
+}
+
+// ---------------------------------------------------------------
+// Footer
+// ---------------------------------------------------------------
+.site-footer {
+  background: var(--ink);
+  color: rgba(255, 255, 255, 0.65);
+  padding-block: $space-5 $space-3;
+
+  h4 {
+    color: var(--white);
+    font-size: 0.8125rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 1.25rem;
+  }
+
+  a {
+    color: rgba(255, 255, 255, 0.65);
+    transition: color 0.2s ease;
+
+    &:hover {
+      color: var(--accent);
+    }
+  }
+
+  ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+
+    li {
+      margin-bottom: 0.6rem;
+      font-size: 0.9375rem;
+    }
+  }
+
+  &__brand strong {
+    font-family: var(--font-heading);
+    color: var(--white);
+    font-size: 1.1rem;
+    letter-spacing: 0.04em;
+  }
+
+  &__bottom {
+    margin-top: $space-4;
+    padding-top: $space-3;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    justify-content: space-between;
+    font-size: 0.8125rem;
+  }
+}
+
+// ---------------------------------------------------------------
+// 404
+// ---------------------------------------------------------------
+.not-found {
+  min-height: 70vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding-block: $space-6;
+}
